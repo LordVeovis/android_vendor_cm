@@ -101,6 +101,9 @@ on boot
     chown system system /dev/cpuctl/apps/cpu.notify_on_migrate
     chmod 0644 /dev/cpuctl/apps/cpu.notify_on_migrate
 
+	# activates the pmtu mecanism (Free Mobile)
+	write /proc/sys/net/ipv4/tcp_mtu_probing 1
+
 # adb over network
 on property:service.adb.tcp.port=5555
     stop adbd
