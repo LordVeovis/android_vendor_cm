@@ -34,4 +34,11 @@ PRODUCT_PACKAGES += \
 
 # Extra tools in CM
 PRODUCT_PACKAGES += \
-    vim
+    vim \
+    aac \
+    flac \
+    exfat \
+    iputils \
+    pciutils \
+    tcpdump \
+    zxing
