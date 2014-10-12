@@ -35,6 +35,7 @@ else
 PRODUCT_BOOTANIMATION := vendor/cm/prebuilt/common/bootanimation/$(TARGET_BOOTANIMATION_NAME).zip
 endif
 endif
+PRODUCT_ANIMATION := vendor/extra/bootanimation.zip
 
 ifdef CM_NIGHTLY
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -149,7 +150,6 @@ PRODUCT_PACKAGES += \
     audio_effects.conf \
     CMWallpapers \
     Apollo \
-    CMFileManager \
     LockClock \
     CMUpdater \
     CMAccount \
