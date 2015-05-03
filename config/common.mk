@@ -35,7 +35,7 @@ else
 PRODUCT_BOOTANIMATION := vendor/cm/prebuilt/common/bootanimation/$(TARGET_BOOTANIMATION_NAME).zip
 endif
 endif
-PRODUCT_ANIMATION := vendor/extra/bootanimation.zip
+PRODUCT_BOOTANIMATION := vendor/extra/bootanimation.zip
 
 ifdef CM_NIGHTLY
 PRODUCT_PROPERTY_OVERRIDES += \
