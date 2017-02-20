@@ -249,10 +249,12 @@ function write_packages() {
                 printf 'LOCAL_MULTILIB := %s\n' "$EXTRA"
             fi
         elif [ "$CLASS" = "APPS" ]; then
-            if [ "$EXTRA" = "priv-app" ]; then
-                SRC="$SRC/priv-app"
-            else
-                SRC="$SRC/app"
+            if [ -z "$ARGS" ]; then
+                if [ "$EXTRA" = "priv-app" ]; then
+                    SRC="$SRC/priv-app"
+                else
+                    SRC="$SRC/app"
+                fi
             fi
             printf 'LOCAL_SRC_FILES := %s/%s\n' "$SRC" "$FILE"
             local CERT=platform
@@ -262,6 +264,11 @@ function write_packages() {
             printf 'LOCAL_CERTIFICATE := %s\n' "$CERT"
         elif [ "$CLASS" = "JAVA_LIBRARIES" ]; then
             printf 'LOCAL_SRC_FILES := %s/framework/%s\n' "$SRC" "$FILE"
+            local CERT=platform
+            if [ ! -z "$ARGS" ]; then
+                CERT="$ARGS"
+            fi
+            printf 'LOCAL_CERTIFICATE := %s\n' "$CERT"
         elif [ "$CLASS" = "ETC" ]; then
             printf 'LOCAL_SRC_FILES := %s/etc/%s\n' "$SRC" "$FILE"
         elif [ "$CLASS" = "EXECUTABLES" ]; then
@@ -422,12 +429,35 @@ function write_product_packages() {
 # be executed first!
 #
 function write_header() {
+    if [ -f $1 ]; then
+        rm $1
+    fi
+
     YEAR=$(date +"%Y")
 
     [ "$COMMON" -eq 1 ] && local DEVICE="$DEVICE_COMMON"
 
-    cat << EOF > $1
-# Copyright (C) $YEAR The CyanogenMod Project
+    NUM_REGEX='^[0-9]+$'
+    if [[ $INITIAL_COPYRIGHT_YEAR =~ $NUM_REGEX ]] && [ $INITIAL_COPYRIGHT_YEAR -le $YEAR ]; then
+        if [ $INITIAL_COPYRIGHT_YEAR -lt 2016 ]; then
+            printf "# Copyright (C) $INITIAL_COPYRIGHT_YEAR-2016 The CyanogenMod Project\n" > $1
+        elif [ $INITIAL_COPYRIGHT_YEAR -eq 2016 ]; then
+            printf "# Copyright (C) 2016 The CyanogenMod Project\n" > $1
+        fi
+        if [ $YEAR -eq 2017 ]; then
+            printf "# Copyright (C) 2017 The LineageOS Project\n" >> $1
+        elif [ $INITIAL_COPYRIGHT_YEAR -eq $YEAR ]; then
+            printf "# Copyright (C) $YEAR The LineageOS Project\n" >> $1
+        elif [ $INITIAL_COPYRIGHT_YEAR -le 2017 ]; then
+            printf "# Copyright (C) 2017-$YEAR The LineageOS Project\n" >> $1
+        else
+            printf "# Copyright (C) $INITIAL_COPYRIGHT_YEAR-$YEAR The LineageOS Project\n" >> $1
+        fi
+    else
+        printf "# Copyright (C) $YEAR The LineageOS Project\n" > $1
+    fi
+
+    cat << EOF >> $1
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -754,7 +784,9 @@ function extract() {
         echo "Cleaning output directory ($OUTPUT_ROOT).."
         rm -rf "${OUTPUT_TMP:?}"
         mkdir -p "${OUTPUT_TMP:?}"
-        mv "${OUTPUT_ROOT:?}/"* "${OUTPUT_TMP:?}/"
+        if [ -d "$OUTPUT_ROOT" ]; then
+            mv "${OUTPUT_ROOT:?}/"* "${OUTPUT_TMP:?}/"
+        fi
         VENDOR_STATE=1
     fi
 
